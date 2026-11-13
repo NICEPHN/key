@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NiceProxy_Key System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #070913;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 255, 204, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(0, 153, 255, 0.08) 0%, transparent 45%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(13, 19, 33, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            border-radius: 20px;
+            padding: 35px 25px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 255, 204, 0.15);
+            text-align: center;
+        }
+
+        /* Tiêu đề có thể click ẩn để mở menu admin */
+        h1 {
+            font-size: 22px;
+            margin-bottom: 25px;
+            color: #00ffcc;
+            text-shadow: 0 0 12px rgba(0, 255, 204, 0.5);
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+        }
+
+        .step-indicator {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00ffcc 0%, #0099ff 100%);
+            color: #070913;
+            border: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.35);
+            margin-bottom: 15px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 255, 204, 0.6);
+            filter: brightness(1.05);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background: #1e293b;
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .timer-box {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #cbd5e1;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .timer-box span {
+            color: #00ffcc;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .result-box {
+            margin-top: 15px;
+            background: rgba(3, 7, 18, 0.8);
+            border: 1px dashed rgba(0, 255, 204, 0.5);
+            padding: 15px;
+            border-radius: 12px;
+            word-break: break-all;
+            font-family: monospace;
+            color: #00ffcc;
+            font-size: 15px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Phần nhập code ẩn (Admin Panel) */
+        .admin-section {
+            display: none; /* Mặc định ẩn hoàn toàn */
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.15);
+            text-align: left;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-section label {
+            font-size: 12px;
+            color: #cbd5e1;
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-field {
+            flex: 1;
+            background: rgba(3, 7, 18, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #00ffcc;
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 255, 204, 0.1);
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 204, 0.25);
+        }
+
+        .status-msg {
+            font-size: 12px;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .error { color: #f87171; }
+        .success { color: #34d399; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Bấm liên tiếp 5 lần vào tiêu đề này để hiện/ẩn khung nhập mã Admin -->
+        <h1 id="main-title" onclick="handleTitleClick()">NiceProxy_Key</h1>
+        
+        <!-- Main Get Key Section -->
+        <div id="main-flow">
+            <div class="step-indicator" id="step-indicator">Bước: 1 / 10</div>
+            <button id="action-btn" class="btn" onclick="startCheckpoint()">Bắt đầu</button>
+            <div id="timer-container" class="timer-box" style="display: none;">
+                Vui lòng đợi <span id="countdown">15</span> giây...
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-container" style="display: none;">
+            <div class="result-box" id="key-display">NiceProxy_xxxxxx</div>
+            <button class="btn" style="margin-top: 15px;" onclick="copyKey()">Sao Chép Key</button>
+        </div>
+
+        <!-- Admin Bypass Code Section (Bị ẩn hoàn toàn với người thường) -->
+        <div class="admin-section" id="admin-panel">
+            <label for="admin-code">Mã Độc Quyền (Admin Power):</label>
+            <div class="input-group">
+                <input type="text" id="admin-code" class="input-field" placeholder="Nhập mã code...">
+                <button class="btn-secondary" onclick="verifyAdminCode()">Xác nhận</button>
+            </div>
+            <div id="admin-status" class="status-msg"></div>
+            <div style="font-size: 11px; color: #64748b; margin-top: 6px; text-align: center;">
+                Lượt dùng: Vô hạn (Admin Mode)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const maxSteps = 10;
+        let timerInterval = null;
+
+        // Biến xử lý mở khóa ẩn khung Admin
+        let clickCount = 0;
+        let clickTimer = null;
+
+        function handleTitleClick() {
+            clickCount++;
+            clearTimeout(clickTimer);
+            
+            if (clickCount >= 5) {
+                const adminPanel = document.getElementById('admin-panel');
+                if (adminPanel.style.display === 'block') {
+                    adminPanel.style.display = 'none';
+                    alert('Đã ẩn bảng mã Admin!');
+                } else {
+                    adminPanel.style.display = 'block';
+                    alert('Đã mở khóa bảng mã Admin!');
+                }
+                clickCount = 0;
+            } else {
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 600);
+            }
+        }
+
+        function startCheckpoint() {
+            const btn = document.getElementById('action-btn');
+            const timerContainer = document.getElementById('timer-container');
+            const countdownSpan = document.getElementById('countdown');
+            
+            btn.style.display = 'none';
+            timerContainer.style.display = 'block';
+            
+            let timeLeft = 15;
+            countdownSpan.innerText = timeLeft;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                countdownSpan.innerText = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerContainer.style.display = 'none';
+                    
+                    if (currentStep < maxSteps) {
+                        currentStep++;
+                        document.getElementById('step-indicator').innerText = `Bước: ${currentStep} / ${maxSteps}`;
+                        btn.innerText = `Tiếp tục (Bước ${currentStep})`;
+                        btn.style.display = 'block';
+                    } else {
+                        showGeneratedKey();
+                    }
+                }
+            }, 1000);
+        }
+
+        function generateRandomKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < 10; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return `NiceProxy_${result}`;
+        }
+
+        function showGeneratedKey() {
+            document.getElementById('main-flow').style.display = 'none';
+            const finalKey = generateRandomKey();
+            document.getElementById('key-display').innerText = finalKey;
+            document.getElementById('result-container').style.display = 'block';
+        }
+
+        function copyKey() {
+            const keyText = document.getElementById('key-display').innerText;
+            navigator.clipboard.writeText(keyText).then(() => {
+                alert('Đã sao chép key thành công!');
+            }).catch(err => {
+                alert('Không thể sao chép tự động!');
+            });
+        }
+
+        function verifyAdminCode() {
+            const codeInput = document.getElementById('admin-code').value.trim();
+            const statusMsg = document.getElementById('admin-status');
+
+            if (codeInput === 'Admin_Power_Proxy') {
+                statusMsg.className = 'status-msg success';
+                statusMsg.innerText = 'Xác nhận thành công! Đang lấy key...';
+
+                setTimeout(() => {
+                    showGeneratedKey();
+                }, 800);
+            } else {
+                statusMsg.className = 'status-msg error';
+                statusMsg.innerText = 'Mã code không chính xác!';
+            }
+        }
+    </script>
+</body>
+</html>
